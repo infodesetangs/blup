@@ -1,0 +1,37 @@
+/* ================================================================
+   AJOUTS FLARE — à coller À LA FIN de ton styles.css existant
+   ================================================================ */
+
+/* Pendant un envoi / une requête : évite les doubles clics */
+.busy .btn-primary,
+.busy .snap-send-btn,
+.busy .send-msg-btn { opacity: .55; pointer-events: none; }
+
+/* Story plein écran : on masque l'en-tête et la barre du bas */
+#app-screen.immersive #main-header,
+#app-screen.immersive #bottom-nav { display: none; }
+
+/* Messages */
+.msg-sender { font-size: 11px; font-weight: 600; color: var(--secondary); margin-bottom: 2px; }
+.msg.snap-msg .msg-sender { padding: 8px 12px 0; }
+.msg.snap-msg video { width: 100%; border-radius: 18px; display: block; }
+.msg.snap-msg img { cursor: pointer; }
+.conv-status.offline { color: var(--text3); }
+
+/* Profil */
+.profile-bio { color: var(--text2); font-size: 14px; margin-top: 8px; padding: 0 24px; white-space: pre-wrap; }
+.story-thumb { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+
+/* Textes d'aide / listes vides */
+.hint { color: var(--text3); font-size: 13px; padding: 8px 0; }
+
+/* Découvrir */
+.discover-card { cursor: pointer; }
+.discover-card video { width: 100%; height: 200px; object-fit: cover; display: block; }
+
+/* Boutons désactivés (ami / demande envoyée) */
+.add-friend-btn:disabled { cursor: default; opacity: .8; }
+.btn-secondary:disabled { opacity: .6; cursor: default; }
+
+/* La liste d'envoi de snap doit pouvoir défiler jusqu'au bouton */
+.send-list { max-height: 55vh; overflow-y: auto; }
