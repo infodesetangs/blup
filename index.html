@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flare 🔥</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <!-- ==================== AUTH ==================== -->
+    <div id="auth-screen" class="screen active">
+        <div class="auth-container">
+            <div class="auth-logo">
+                <div class="logo-icon">🔥</div>
+                <h1>Flare</h1>
+                <p class="auth-tagline">Capture. Share. Connect.</p>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form" class="auth-form">
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="login-username" placeholder="Nom d'utilisateur" autocomplete="username" autocapitalize="none" autocorrect="off" onkeydown="if(event.key==='Enter')login()">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="login-password" placeholder="Mot de passe" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()">
+                </div>
+                <button class="btn-primary" onclick="login()">Se connecter</button>
+                <p class="auth-switch">Pas encore de compte ? <a href="#" onclick="showRegister();return false;">S'inscrire</a></p>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-form" class="auth-form" style="display:none">
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="reg-username" placeholder="Nom d'utilisateur (a-z, 0-9, _)" autocomplete="off" autocapitalize="none" autocorrect="off" maxlength="20">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-at"></i>
+                    <input type="text" id="reg-display" placeholder="Nom affiché" autocomplete="off" maxlength="40">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="reg-password" placeholder="Mot de passe (6 min)" autocomplete="new-password">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="reg-password2" placeholder="Confirmer le mot de passe" autocomplete="new-password" onkeydown="if(event.key==='Enter')register()">
+                </div>
+                <button class="btn-primary" onclick="register()">Créer mon compte</button>
+                <p class="auth-switch">Déjà un compte ? <a href="#" onclick="showLogin();return false;">Se connecter</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MAIN APP ==================== -->
+    <div id="app-screen" class="screen">
+        <!-- Top Header -->
+        <header id="main-header">
+            <div class="header-left">
+                <button onclick="showView('profile')" class="header-btn"><i class="fas fa-user-circle"></i></button>
+            </div>
+            <div class="header-center">
+                <span class="header-logo">🔥 Flare</span>
+            </div>
+            <div class="header-right">
+                <button onclick="showView('add-friends')" class="header-btn"><i class="fas fa-user-plus"></i></button>
+            </div>
+        </header>
+
+        <!-- Views Container -->
+        <div id="views-container">
+            <!-- ===== CHAT LIST ===== -->
+            <div id="view-chats" class="view active">
+                <div class="view-header">
+                    <h2>Messages</h2>
+                    <div class="view-actions">
+                        <button onclick="showView('new-group')" title="Nouveau groupe"><i class="fas fa-users"></i></button>
+                    </div>
+                </div>
+                <div id="chat-list" class="scrollable">
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <p>Aucun message pour le moment</p>
+                        <p class="sub">Ajoute des amis pour commencer !</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== CAMERA ===== -->
+            <div id="view-camera" class="view">
+                <div class="camera-container">
+                    <video id="camera-feed" autoplay playsinline muted></video>
+                    <canvas id="camera-canvas" style="display:none"></canvas>
+                    <div class="camera-overlay">
+                        <div class="camera-top">
+                            <button onclick="toggleFlash()" class="cam-btn"><i class="fas fa-bolt"></i></button>
+                            <button onclick="switchCamera()" class="cam-btn"><i class="fas fa-sync-alt"></i></button>
+                        </div>
+                        <div class="camera-bottom">
+                            <button class="gallery-btn" onclick="document.getElementById('snap-upload').click()">
+                                <i class="fas fa-images"></i>
+                            </button>
+                            <button class="capture-btn" onclick="captureSnap()">
+                                <div class="capture-ring"></div>
+                            </button>
+                            <button class="flip-btn" onclick="switchCamera()">
+                                <i class="fas fa-camera-rotate"></i>
+                            </button>
+                        </div>
+                        <input type="file" id="snap-upload" accept="image/*,video/*" style="display:none" onchange="handleSnapUpload(event)">
+                    </div>
+                </div>
+                <!-- Snap Preview -->
+                <div id="snap-preview" class="snap-preview" style="display:none">
+                    <img id="snap-preview-img" src="" alt="">
+                    <video id="snap-preview-vid" style="display:none" loop autoplay playsinline></video>
+                    <div class="snap-preview-top">
+                        <button onclick="closeSnapPreview()"><i class="fas fa-times"></i></button>
+                        <div class="snap-drawing-tools">
+                            <button onclick="addSnapText()"><i class="fas fa-font"></i></button>
+                            <button onclick="addSnapSticker()"><i class="fas fa-smile"></i></button>
+                        </div>
+                    </div>
+                    <div class="snap-preview-bottom">
+                        <button onclick="saveToStory()" class="snap-action-btn" title="Ma Story">
+                            <i class="fas fa-book-open"></i><span>Story</span>
+                        </button>
+                        <button onclick="openSendSnapTo()" class="snap-send-btn" title="Envoyer">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- Send Snap To -->
+                <div id="send-snap-modal" class="modal" style="display:none">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Envoyer à...</h3>
+                            <button onclick="closeSendSnapTo()"><i class="fas fa-times"></i></button>
+                        </div>
+                        <div id="send-snap-list" class="send-list scrollable"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== STORIES ===== -->
+            <div id="view-stories" class="view">
+                <div class="view-header">
+                    <h2>Stories</h2>
+                </div>
+                <div id="stories-list" class="scrollable">
+                    <!-- My Story -->
+                    <div class="story-section">
+                        <div class="story-item my-story" onclick="showView('camera')">
+                            <div class="story-avatar add-story">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <span>Ma Story</span>
+                        </div>
+                    </div>
+                    <div id="friends-stories" class="story-section">
+                        <h3>Stories d'amis</h3>
+                    </div>
+                    <div id="discover-stories" class="story-section">
+                        <h3>Découvrir</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== DISCOVER / EXPLORE ===== -->
+            <div id="view-discover" class="view">
+                <div class="view-header">
+                    <h2>Découvrir</h2>
+                </div>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="discover-search" placeholder="Chercher des utilisateurs..." oninput="searchUsers(this.value)">
+                </div>
+                <div id="discover-content" class="scrollable">
+                    <div class="empty-state">
+                        <i class="fas fa-compass"></i>
+                        <p>Explore et trouve du contenu</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== CHAT CONVERSATION ===== -->
+            <div id="view-conversation" class="view">
+                <div class="conv-header">
+                    <button onclick="showView('chats')" class="back-btn"><i class="fas fa-arrow-left"></i></button>
+                    <div class="conv-info" onclick="showConvInfo()">
+                        <div class="conv-avatar" id="conv-avatar"></div>
+                        <div>
+                            <div class="conv-name" id="conv-name"></div>
+                            <div class="conv-status" id="conv-status"></div>
+                        </div>
+                    </div>
+                    <div class="conv-actions">
+                        <button onclick="startCall('video')"><i class="fas fa-video"></i></button>
+                        <button onclick="startCall('audio')"><i class="fas fa-phone"></i></button>
+                    </div>
+                </div>
+                <div id="conv-messages" class="conv-messages scrollable"></div>
+                <div class="conv-input-area">
+                    <button class="emoji-btn" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>
+                    <input type="text" id="conv-input" placeholder="Message..." maxlength="2000" onkeydown="if(event.key==='Enter')sendMessage()">
+                    <button class="cam-mini-btn" onclick="openSnapInConv()"><i class="fas fa-camera"></i></button>
+                    <button class="send-msg-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+
+            <!-- ===== PROFILE ===== -->
+            <div id="view-profile" class="view">
+                <div class="view-header">
+                    <button onclick="showView('chats')" class="back-btn"><i class="fas fa-arrow-left"></i></button>
+                    <h2>Mon Profil</h2>
+                    <button onclick="showSettings()" class="header-btn"><i class="fas fa-cog"></i></button>
+                </div>
+                <div class="profile-content scrollable">
+                    <div class="profile-hero">
+                        <div class="profile-avatar-container">
+                            <div class="profile-avatar" id="profile-avatar"></div>
+                            <button class="avatar-edit" onclick="changeProfilePhoto()"><i class="fas fa-camera"></i></button>
+                            <input type="file" id="profile-photo-input" accept="image/*" style="display:none" onchange="handleProfilePhoto(event)">
+                        </div>
+                        <h2 id="profile-display-name"></h2>
+                        <p class="profile-username" id="profile-username"></p>
+                        <p class="profile-bio" id="profile-bio"></p>
+                        <div class="profile-stats">
+                            <div class="stat"><span id="stat-friends">0</span><label>Amis</label></div>
+                            <div class="stat"><span id="stat-snaps">0</span><label>Snaps</label></div>
+                            <div class="stat"><span id="stat-views">0</span><label>Vues</label></div>
+                        </div>
+                    </div>
+                    <div class="profile-actions">
+                        <button onclick="editProfile()" class="btn-secondary"><i class="fas fa-edit"></i> Modifier le profil</button>
+                    </div>
+                    <div class="profile-section">
+                        <h3>Ma Story</h3>
+                        <div id="my-stories-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ADD FRIENDS ===== -->
+            <div id="view-add-friends" class="view">
+                <div class="view-header">
+                    <button onclick="showView('chats')" class="back-btn"><i class="fas fa-arrow-left"></i></button>
+                    <h2>Ajouter des amis</h2>
+                </div>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="friend-search" placeholder="Nom d'utilisateur..." oninput="searchFriends(this.value)">
+                </div>
+                <div id="friend-results" class="scrollable">
+                    <div class="empty-state">
+                        <i class="fas fa-user-friends"></i>
+                        <p>Cherche des amis par nom d'utilisateur</p>
+                    </div>
+                </div>
+                <div class="profile-section">
+                    <h3>Demandes d'amis</h3>
+                    <div id="friend-requests"></div>
+                </div>
+            </div>
+
+            <!-- ===== NEW GROUP ===== -->
+            <div id="view-new-group" class="view">
+                <div class="view-header">
+                    <button onclick="showView('chats')" class="back-btn"><i class="fas fa-arrow-left"></i></button>
+                    <h2>Nouveau Groupe</h2>
+                    <button onclick="createGroup()" class="header-btn"><i class="fas fa-check"></i></button>
+                </div>
+                <div class="group-creation scrollable">
+                    <div class="input-group">
+                        <i class="fas fa-users"></i>
+                        <input type="text" id="group-name" placeholder="Nom du groupe" maxlength="40">
+                    </div>
+                    <div class="group-photo-upload" onclick="document.getElementById('group-photo-input').click()">
+                        <div class="group-photo-preview" id="group-photo-preview">
+                            <i class="fas fa-camera"></i>
+                            <span>Photo du groupe</span>
+                        </div>
+                        <input type="file" id="group-photo-input" accept="image/*" style="display:none" onchange="handleGroupPhoto(event)">
+                    </div>
+                    <h3>Ajouter des membres</h3>
+                    <div id="group-members-list" class="member-select-list"></div>
+                </div>
+            </div>
+
+            <!-- ===== STORY VIEWER ===== -->
+            <div id="view-story-viewer" class="view story-viewer-full">
+                <div class="story-viewer-header">
+                    <div class="sv-user-info">
+                        <div class="sv-avatar" id="sv-avatar"></div>
+                        <div>
+                            <div class="sv-name" id="sv-name"></div>
+                            <div class="sv-time" id="sv-time"></div>
+                        </div>
+                    </div>
+                    <button onclick="closeStoryViewer()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="story-progress" id="story-progress"></div>
+                <div class="story-viewer-content" id="story-viewer-content"></div>
+                <div class="story-viewer-footer">
+                    <input type="text" id="story-reply-input" placeholder="Répondre..." maxlength="500" onkeydown="if(event.key==='Enter')replyToStory()">
+                    <div class="story-actions">
+                        <button onclick="likeStory()" id="story-like-btn"><i class="far fa-heart"></i></button>
+                        <button onclick="reactStory()"><i class="fas fa-face-surprise"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== USER PROFILE VIEW ===== -->
+            <div id="view-user-profile" class="view">
+                <div class="view-header">
+                    <button onclick="goBack()" class="back-btn"><i class="fas fa-arrow-left"></i></button>
+                    <h2>Profil</h2>
+                </div>
+                <div class="profile-content scrollable">
+                    <div class="profile-hero">
+                        <div class="profile-avatar-container">
+                            <div class="profile-avatar" id="user-profile-avatar"></div>
+                        </div>
+                        <h2 id="user-profile-display"></h2>
+                        <p class="profile-username" id="user-profile-username"></p>
+                        <p class="profile-bio" id="user-profile-bio"></p>
+                    </div>
+                    <div class="profile-actions" id="user-profile-actions"></div>
+                    <div class="profile-section">
+                        <h3>Stories</h3>
+                        <div id="user-stories-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== EDIT PROFILE ===== -->
+            <div id="view-edit-profile" class="view">
+                <div class="view-header">
+                    <button onclick="showView('profile')" class="back-btn"><i class="fas fa-arrow-left"></i></button>
+                    <h2>Modifier le profil</h2>
+                    <button onclick="saveProfile()" class="header-btn"><i class="fas fa-check"></i></button>
+                </div>
+                <div class="edit-profile-content scrollable">
+                    <div class="input-group">
+                        <label>Nom affiché</label>
+                        <input type="text" id="edit-display-name" placeholder="Ton nom" maxlength="40">
+                    </div>
+                    <div class="input-group">
+                        <label>Bio</label>
+                        <textarea id="edit-bio" placeholder="Parle un peu de toi..." rows="3" maxlength="200"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SETTINGS ===== -->
+            <div id="view-settings" class="view">
+                <div class="view-header">
+                    <button onclick="showView('profile')" class="back-btn"><i class="fas fa-arrow-left"></i></button>
+                    <h2>Paramètres</h2>
+                </div>
+                <div class="settings-content scrollable">
+                    <div class="settings-group">
+                        <h3>Compte</h3>
+                        <div class="setting-item" onclick="editProfile()">
+                            <i class="fas fa-user"></i><span>Modifier le profil</span><i class="fas fa-chevron-right"></i>
+                        </div>
+                        <div class="setting-item" onclick="toast('Confidentialité : bientôt disponible')">
+                            <i class="fas fa-lock"></i><span>Confidentialité</span><i class="fas fa-chevron-right"></i>
+                        </div>
+                        <div class="setting-item" onclick="toast('Notifications : bientôt disponible')">
+                            <i class="fas fa-bell"></i><span>Notifications</span><i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="settings-group">
+                        <h3>Flare</h3>
+                        <div class="setting-item" onclick="toast('Flare 🔥 — Capture. Share. Connect.')">
+                            <i class="fas fa-info-circle"></i><span>À propos</span><i class="fas fa-chevron-right"></i>
+                        </div>
+                        <div class="setting-item danger" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i><span>Se déconnecter</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav id="bottom-nav">
+            <button class="nav-btn active" data-view="chats" onclick="showView('chats')">
+                <i class="fas fa-comment"></i>
+                <span>Chat</span>
+            </button>
+            <button class="nav-btn" data-view="camera" onclick="showView('camera')">
+                <div class="nav-camera-btn">
+                    <i class="fas fa-camera"></i>
+                </div>
+            </button>
+            <button class="nav-btn" data-view="stories" onclick="showView('stories')">
+                <i class="fas fa-play-circle"></i>
+                <span>Stories</span>
+            </button>
+            <button class="nav-btn" data-view="discover" onclick="showView('discover')">
+                <i class="fas fa-compass"></i>
+                <span>Découvrir</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Emoji Picker -->
+    <div id="emoji-picker" class="emoji-picker" style="display:none">
+        <div class="emoji-grid"></div>
+    </div>
+
+    <!-- Supabase (base de données + stockage + temps réel) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+</body>
+</html>
